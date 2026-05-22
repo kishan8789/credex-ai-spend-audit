@@ -1,5 +1,3 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { auditEngine } from "@/lib/audit-engine";
 import { generateAISummary } from "@/services/ai-service";
@@ -33,7 +31,7 @@ export async function POST(request: NextRequest) {
             recommendations: auditResult.recommendations,
         });
 
-        // Save to database
+        // Save audit
         const { data: auditData, error: auditError } = await supabaseAdmin
             .from("audits")
             .insert({
@@ -48,12 +46,13 @@ export async function POST(request: NextRequest) {
 
         if (auditError) throw auditError;
 
-        // Save tools
+        // Save tool recommendations
         const toolsToInsert = auditResult.recommendations.map((rec) => ({
             audit_id: auditData.id,
             tool_name: rec.toolName,
             plan_name: rec.currentPlan,
-            monthly_spend: tools.find((t: any) => t.name === rec.toolName)?.monthlySpend || 0,
+            monthly_spend:
+                tools.find((t: any) => t.name === rec.toolName)?.monthlySpend || 0,
             recommended_plan: rec.recommendedPlan,
             recommended_tool: rec.recommendedTool || null,
             estimated_savings: rec.estimatedSavings,
@@ -65,7 +64,7 @@ export async function POST(request: NextRequest) {
 
         if (toolsError) throw toolsError;
 
-        // Save AI summary as a separate record
+        // Save AI summary
         const { error: summaryError } = await supabaseAdmin
             .from("audit_summaries")
             .insert({
@@ -73,11 +72,17 @@ export async function POST(request: NextRequest) {
                 summary: aiSummary,
             });
 
-        if (summaryError) console.error("Summary save error:", summaryError);
+        if (summaryError) {
+            console.error("Summary save error:", summaryError);
+        }
 
-        return NextResponse.json({ id: auditData.id }, { status: 201 });
+        return NextResponse.json(
+            { id: auditData.id },
+            { status: 201 }
+        );
     } catch (error) {
         console.error("Audit API error:", error);
+
         return NextResponse.json(
             { error: "Failed to process audit" },
             { status: 500 }
