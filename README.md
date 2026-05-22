@@ -1,71 +1,119 @@
-# Credex AI Spend Audit
+Credex AI Spend Audit
 
-A SaaS application that helps startups analyze their AI tool spending and discover cheaper alternatives.
+AI-powered SaaS platform that helps startups analyze AI tool expenses, optimize subscriptions, and discover cost-saving alternatives.
 
-## Features
+🚀 Live Demo
+Frontend: Add Vercel URL here
+GitHub Repo: GitHub Repository
+📌 Problem Statement
 
-- 📊 **Spend Analysis** - Input your AI tools and current spending
-- 💡 **Smart Recommendations** - Get personalized suggestions for cost optimization
-- 📈 **Potential Savings** - See exactly how much you could save monthly and yearly
-- 🤖 **AI-Generated Summary** - Get founder-friendly insights using Claude or GPT
-- 📧 **Email Reports** - Save and share your audit via email
-- 🔗 **Shareable URLs** - Create public audit results for team sharing
+Modern startups use multiple AI tools like ChatGPT, Claude, Cursor, Notion AI, and GitHub Copilot.
+Most teams overspend because they:
 
-## Tech Stack
+Use higher plans than required
+Pay for unused seats
+Miss cheaper alternatives
+Lack centralized spending visibility
 
-### Frontend
-- **Next.js 15** - React framework with App Router
-- **TypeScript** - Type safety across the codebase
-- **Tailwind CSS** - Utility-first styling
-- **shadcn/ui** - Accessible component library
+Credex AI Spend Audit solves this by generating intelligent cost optimization reports.
 
-### Backend
-- **Next.js API Routes** - Serverless functions for backend logic
-- **Supabase PostgreSQL** - Database for audits and results
-- **Anthropic Claude API** - Primary AI model for summaries
-- **OpenAI GPT** - Fallback AI model
+✨ Features
+📊 Spend Analysis
 
-### Additional Services
-- **Resend** - Email delivery
-- **Vercel** - Deployment platform
+Analyze current AI subscriptions and monthly costs.
 
-### Testing
-- **Vitest** - Unit and integration tests
-- **React Testing Library** - Component testing
+🤖 AI-Powered Recommendations
 
-## Quick Start
+Get optimized tool and pricing recommendations using Claude/OpenAI.
 
-### Prerequisites
-- Node.js 18+
-- npm or yarn
-- Supabase account
-- Anthropic API key (optional but recommended)
-- OpenAI API key (fallback)
-- Resend account for emails
+💰 Savings Calculator
 
-### Setup
+See monthly and yearly potential savings instantly.
 
-1. **Clone and install:**
-```bash
-npm install
-```
+📧 Email Reports
 
-2. **Configure environment:**
-```bash
-cp .env.example .env.local
-```
+Send audit summaries directly to founders or team members.
 
-Edit `.env.local` with your API keys:
-- Supabase credentials
-- Anthropic/OpenAI API keys
-- Resend API key
+🔗 Public Share Links
 
-3. **Set up database:**
+Generate shareable audit URLs for stakeholders.
 
-Create these tables in Supabase:
+💾 Persistent Form State
 
-```sql
--- Audits table
+Auto-save form data using localStorage.
+
+📱 Responsive Dashboard
+
+Fully responsive modern UI built using Tailwind + shadcn/ui.
+
+🛠 Tech Stack
+Frontend
+Next.js
+TypeScript
+Tailwind CSS
+shadcn/ui
+Backend
+Next.js API Routes
+Supabase PostgreSQL
+Anthropic Claude API
+OpenAI GPT API
+Services
+Resend
+Vercel
+Testing
+Vitest
+React Testing Library
+🧱 System Architecture
+User → Next.js Frontend → API Routes → Audit Engine
+                                   ↓
+                           Supabase Database
+                                   ↓
+                        Claude/OpenAI AI Service
+                                   ↓
+                            Email + Public Links
+📂 Folder Structure
+/app
+  /(marketing)
+  /(dashboard)
+    /audit
+    /results/[id]
+
+  /api
+    /audit
+    /email
+    /public
+
+/components
+  /ui
+
+/lib
+  utils.ts
+  supabase.ts
+  audit-engine.ts
+
+/services
+  ai-service.ts
+  email-service.ts
+
+/types
+/tests
+⚙️ Environment Variables
+
+Create .env.local
+
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+
+SUPABASE_SERVICE_ROLE_KEY=
+
+ANTHROPIC_API_KEY=
+OPENAI_API_KEY=
+
+RESEND_API_KEY=
+
+NEXT_PUBLIC_APP_URL=
+🗄 Database Schema
+audits
 CREATE TABLE audits (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   email TEXT NOT NULL,
@@ -76,8 +124,7 @@ CREATE TABLE audits (
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
-
--- Audit tools table
+audit_tools
 CREATE TABLE audit_tools (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   audit_id UUID REFERENCES audits(id) ON DELETE CASCADE,
@@ -88,179 +135,110 @@ CREATE TABLE audit_tools (
   recommended_tool TEXT,
   estimated_savings DECIMAL NOT NULL
 );
-
--- Audit summaries table
+audit_summaries
 CREATE TABLE audit_summaries (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   audit_id UUID REFERENCES audits(id) ON DELETE CASCADE,
   summary TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT NOW()
 );
-```
+🔄 Application Flow
+User starts audit
+Adds company + AI tool expenses
+Audit engine analyzes subscriptions
+AI generates optimization insights
+Savings calculated automatically
+Results displayed on dashboard
+Report shared via email/public link
+🧠 Audit Logic
+ChatGPT
+Enterprise → Team plan for small teams
+Pro → Better seat optimization
+Cursor
+Business → Pro for solo developers
+Claude API
+Detects excessive API spend patterns
+Generic Rules
+Detect unused enterprise plans
+Compare against team size
+Calculate yearly savings
+📡 API Endpoints
+POST /api/audit
 
-4. **Run development server:**
-```bash
-npm run dev
-```
+Create new audit.
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Project Structure
-
-```
-/app
-  /(marketing)        # Landing pages
-  /(dashboard)        # Authenticated pages
-    /audit            # Audit form page
-    /results/[id]     # Results page
-  /api
-    /audit            # Audit creation endpoint
-    /email            # Email sending
-    /public           # Public audit viewing
-/components
-  /ui                 # Reusable UI components
-/lib
-  - utils.ts          # Utility functions
-  - supabase.ts       # Supabase client
-  - audit-engine.ts   # Core audit logic
-/services
-  - ai-service.ts     # LLM integration
-  - email-service.ts  # Email handling
-/types
-  - audit.ts          # TypeScript types
-/tests              # Test files
-```
-
-## Main Flow
-
-1. User lands on homepage
-2. Clicks "Start Audit"
-3. Fills in company info, team size, and AI tools with spending
-4. Form data saved to localStorage
-5. Submit triggers audit engine
-6. Results page shows:
-   - Current spend analysis
-   - Recommendations for each tool
-   - AI-generated summary
-   - Total potential savings
-7. User can save report via email or copy shareable link
-8. Public URL allows viewing audit results without email
-
-## Audit Logic
-
-### Tool-Specific Rules
-
-**ChatGPT:**
-- Enterprise for small team → recommend Team plan
-- Pro for large team → recommend Team plan with per-seat pricing
-
-**Cursor:**
-- Business for solo developer → recommend Pro
-
-**Claude API:**
-- High spend with low usage → recommend optimization
-
-**Default:**
-- Compare current plan against optimal tier for team size
-- Calculate monthly savings
-
-## API Endpoints
-
-### POST /api/audit
-Create a new audit
-
-```json
 {
   "companyName": "Acme Inc",
   "email": "founder@acme.com",
-  "teamSize": 5,
-  "tools": [
-    {
-      "name": "ChatGPT",
-      "plan": "Enterprise",
-      "monthlySpend": 200,
-      "seats": 1
-    }
-  ]
+  "teamSize": 5
 }
-```
+GET /api/public/audit/:id
 
-### GET /api/audit/:id
-Fetch full audit with recommendations (authenticated)
+Fetch public audit report.
 
-### GET /api/public/audit/:id
-Fetch public audit data (no auth needed)
+POST /api/email/send
 
-### POST /api/email/send
-Send audit report via email
+Send audit report via email.
 
-```json
-{
-  "to": "founder@acme.com",
-  "companyName": "Acme Inc",
-  "auditId": "uuid"
-}
-```
-
-## Testing
-
-Run tests:
-```bash
+🧪 Testing
 npm run test
-```
-
-Run tests with UI:
-```bash
 npm run test:ui
-```
 
-## Deployment
+Includes:
 
-Deploy to Vercel:
+Component testing
+API testing
+Audit engine validation
+Utility testing
+🔐 Security Considerations
+API keys stored securely in environment variables
+Public routes separated from internal APIs
+Input validation on API routes
+UUID-based public sharing
+Server-side AI processing
+🚀 Deployment
+Deploy on Vercel
+Push repository to GitHub
+Import project in Vercel
+Configure environment variables
+Deploy
 
-1. Push code to GitHub
-2. Connect repo to Vercel
-3. Add environment variables in Vercel dashboard
-4. Deploy
+Production-ready with serverless scaling.
 
-## Tradeoffs
+📈 Future Improvements
+PDF export
+Stripe billing integration
+Benchmark analytics
+Multi-user collaboration
+Real-time dashboards
+OAuth authentication
+Admin analytics panel
+📊 Business Impact
 
-### Decisions Made
+This platform helps startups:
 
-1. **localStorage for form persistence** - Simple state management without backend state
-2. **Next.js API routes** - Single deployment target, no separate backend needed
-3. **Supabase** - Easy setup, built-in auth ready, good free tier
-4. **Claude + OpenAI** - LLM flexibility with fallback strategy
-5. **Resend for email** - Developer-friendly, good deliverability
+Reduce unnecessary AI expenses
+Improve SaaS budget visibility
+Optimize team subscriptions
+Make data-driven purchasing decisions
+🤝 Contributing
 
-### Alternatives Considered
+Pull requests are welcome.
 
-- Vercel KV for caching (chose simpler approach)
-- Auth0 (chose Supabase for simplicity)
-- S3 for file storage (chose database)
+Please maintain:
 
-## Monitoring & Analytics
+Type safety
+Test coverage
+Consistent code formatting
+📜 License
 
-Key metrics to track:
-- Audit completion rate
-- Average savings discovered
-- Share rate of public URLs
-- Email open rate
-- Tool recommendations distribution
+MIT License © 2026 Kishan Kumar
 
-## Future Enhancements
-
-- PDF export of reports
-- Benchmark mode (compare against similar companies)
-- Referral system
-- Integration with actual billing systems
-- More AI tool coverage
-- Advanced analytics dashboard
-
-## Contributing
-
-Pull requests welcome. Please maintain TypeScript types and test coverage.
-
-## License
-
-MIT
+⭐ Why This Project Stands Out
+Real-world SaaS problem solving
+AI integration with fallback strategy
+Full-stack architecture
+Production-ready deployment
+Scalable database design
+Clean UI/UX implementation
+Modern TypeScript ecosystem
